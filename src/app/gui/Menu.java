@@ -193,6 +193,16 @@ public class Menu<R> {
      * A prompt that takes input from standard input
      *
      * @param question A question presented to the user
+     * @return An integer answer
+     */
+    public static int promptInt(String question) {
+        return promptInt(question, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    /**
+     * A prompt that takes input from standard input
+     *
+     * @param question A question presented to the user
      * @return A double
      */
     public static double promptDouble(String question, double min, double max) {

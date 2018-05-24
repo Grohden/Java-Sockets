@@ -6,23 +6,18 @@ import app.gui.Tuple;
 import java.util.Arrays;
 
 public class App {
-    private static final Menu<Integer> mainMenu = new Menu<>(
-            "Main menu",
+    private static final Menu<Runnable> initialMenu = new Menu<>(
+            "Esta instancia sera:",
             Arrays.asList(
-                    Tuple.from("Registrar", 1),
-                    Tuple.from("Remover registro", 2)
+                    Tuple.from("Cliente", ClientApp::boot),
+                    Tuple.from("Servidor", ServerApp::boot)
             )
-
     );
 
-    private static void bootstrap() {
-        mainMenu.spawnMenuWithExit("Exit").ifPresent(integer -> {
-            System.out.println("Choosen option: " + integer);
-            bootstrap();
-        });
-    }
 
     public static void main(String[] args) {
-        bootstrap();
+        initialMenu
+                .spawnMenu()
+                .run();
     }
 }
