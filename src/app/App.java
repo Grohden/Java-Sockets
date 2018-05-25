@@ -7,10 +7,10 @@ import java.util.Arrays;
 
 public class App {
     private static final Menu<Runnable> initialMenu = new Menu<>(
-            "Esta instancia sera:",
+            "This instance will be",
             Arrays.asList(
-                    Tuple.from("Cliente", ClientApp::boot),
-                    Tuple.from("Servidor", ServerApp::boot)
+                    Tuple.from("A client", ClientApp::boot),
+                    Tuple.from("A server", ServerApp::boot)
             )
     );
 

@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @since 2018-05-23
  */
 public class Menu<R> {
-    private static final String INVALID_CHOICE = "A sua escolha não é valida";
+    private static final String INVALID_CHOICE = "Invalid choice";
 
     /**
      * Title of the menu

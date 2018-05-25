@@ -3,12 +3,10 @@ package app;
 import app.gui.Menu;
 import app.gui.Tuple;
 import app.socket.AppClientSocket;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Scanner;
 
 public class ClientApp {
     private static final String CONNECTION_SUCCESS = "Connection succeeded";
