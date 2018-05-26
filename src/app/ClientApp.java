@@ -2,24 +2,29 @@ package app;
 
 import app.gui.Menu;
 import app.gui.Tuple;
-import app.socket.AppClientSocket;
+import app.museum.User;
+import app.socket.UserAction;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ClientApp {
     private static final String CONNECTION_SUCCESS = "Connection succeeded";
     private static final String CONNECTION_ERROR = "Socket connection error, try again";
 
-    private static final Menu<Integer> clientMenu = new Menu<>(
+    private static final Menu<Consumer<Socket>> clientMenu = new Menu<>(
             "Client menu, choose what to do",
             Arrays.asList(
-                    Tuple.from("Register email", 1),
-                    Tuple.from("Remove email registry", 2),
-                    Tuple.from("See painting infos", 3)
+                    Tuple.from("Register", ClientApp::registerUser),
+                    Tuple.from("Remove registry", s -> {
+                    }),
+                    Tuple.from("View all users", ClientApp::printAllUsers),
+                    Tuple.from("See painting infos", s -> {
+                    })
             )
-
     );
 
     /**
@@ -35,7 +40,7 @@ public class ClientApp {
                 Integer.MAX_VALUE
         );
 
-        Optional<Socket> clientSocket = AppClientSocket.tryConnection(ip, portNumber);
+        Optional<Socket> clientSocket = SocketHelper.tryConnection(ip, portNumber);
         if (clientSocket.isPresent()) {
             System.out.println(CONNECTION_SUCCESS);
             return clientSocket.get();
@@ -46,11 +51,33 @@ public class ClientApp {
 
     }
 
+    private static void printAllUsers(Socket server) {
+
+
+    }
+
+    private static void registerUser(Socket server) {
+        final User user = User.promptUser();
+
+        try {
+            SocketHelper.sendObjectMessage(server, UserAction.REGISTER, user);
+            System.out.println("Success!");
+        } catch (IOException e) {
+            System.out.println("Error sending user");
+        }
+
+        boot();
+    }
+
     /**
      * Boots the client app, asks for connection properties and
      * try to connect
      */
     public static void boot() {
-        getConnection();
+        final Socket server = getConnection();
+
+        clientMenu
+                .spawnMenuWithExit("Exit")
+                .ifPresent(socketConsumer -> socketConsumer.accept(server));
     }
 }

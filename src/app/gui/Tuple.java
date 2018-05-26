@@ -1,6 +1,8 @@
 package app.gui;
 
-public class Tuple<L, R> {
+import java.io.Serializable;
+
+public class Tuple<L, R> implements Serializable {
     private final L left;
     private final R right;
 
