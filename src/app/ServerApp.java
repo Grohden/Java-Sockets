@@ -1,9 +1,14 @@
 package app;
 
-import app.gui.Tuple;
+import app.comunication.server.ServerResponse;
+import app.comunication.server.responses.AllUsers;
+import app.comunication.server.responses.SimpleError;
+import app.comunication.server.responses.SimpleSuccess;
+import app.utils.Tuple;
 import app.museum.User;
 import app.museum.UserRegistry;
-import app.socket.ServerResponse;
+import app.socket.ServerSocketHelper;
+import app.socket.SocketHelper;
 import app.socket.UserAction;
 
 import java.io.IOException;
@@ -18,13 +23,15 @@ public class ServerApp {
     private static final String WAITING_CONNECTION = "Waiting for client, connect at ip %s, port %d";
     private static final String CONNECTION_SUCCESS = "Client connected successfully, waiting for message.";
     private static final String SOCKET_ERROR = "Socket error, exiting.";
+    private static final String EMAIL_ALREADY_IN_USE = "This email is already being used, try another.";
+    private static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
     private static ServerResponse doRegister(User newUser) {
         final boolean success = UserRegistry.addUser(newUser);
 
         return success
-                ? ServerResponse.SUCCESS
-                : ServerResponse.EMAIL_ALREADY_IN_USE;
+                ? new SimpleSuccess("Success")
+                : new SimpleError(EMAIL_ALREADY_IN_USE);
     }
 
     private static ServerResponse processAction(Tuple tuple) {
@@ -33,9 +40,15 @@ public class ServerApp {
         switch (ac) {
             case REGISTER:
                 return doRegister((User) tuple.getRight());
+            case LIST_USERS:
+                return doSendAllUsers();
             default:
-                return ServerResponse.OPERATION_NOT_SUPPORTED;
+                return new SimpleError(OPERATION_NOT_SUPPORTED);
         }
+    }
+
+    private static AllUsers doSendAllUsers() {
+        return new AllUsers(UserRegistry.getAll());
     }
 
     private static void sendResponse(Socket server, ServerResponse response, Integer tryCount) {
@@ -44,7 +57,7 @@ public class ServerApp {
         }
 
         try {
-            SocketHelper.sendResponse(server, response);
+            ServerSocketHelper.sendResponse(server, response);
         } catch (IOException e) {
             sendResponse(server, response, tryCount + 1);
         }
@@ -60,20 +73,25 @@ public class ServerApp {
             final ServerSocket server = new ServerSocket(DEFAULT_PORT);
             final InetAddress localHost = InetAddress.getLocalHost();
 
-            System.out.println(String.format(
-                    WAITING_CONNECTION,
-                    localHost.getHostAddress(),
-                    server.getLocalPort()
-            ));
+            while(true){
 
-            final Socket client = server.accept();
-            System.out.println(CONNECTION_SUCCESS);
+                System.out.println(String.format(
+                        WAITING_CONNECTION,
+                        localHost.getHostAddress(),
+                        server.getLocalPort()
+                ));
 
-            SocketHelper
-                    .getObjectMessage(client, Tuple.class)
-                    .ifPresent(t ->
-                            sendResponse(client, processAction(t))
-                    );
+                final Socket client = server.accept();
+                System.out.println(CONNECTION_SUCCESS);
+
+                SocketHelper
+                        .getObjectMessage(client, Tuple.class)
+                        .ifPresent(t ->
+                                sendResponse(client, processAction(t))
+                        );
+
+                client.close();
+            }
 
         } catch (IOException e) {
             System.out.println(SOCKET_ERROR);

@@ -1,5 +1,7 @@
 package app.gui;
 
+import app.utils.Tuple;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -9,7 +11,7 @@ import java.util.Scanner;
  * <br />
  * Menu api for the command line
  * <p>
- * Takes a list of options containing a value and a menu title, when called, the menu returns an optional type containing the option.
+ * Takes a list of client containing a value and a menu title, when called, the menu returns an optional type containing the option.
  * </p>
  *
  * @author Patrick Marchand <mail@patrickmarchand.com>
@@ -36,7 +38,7 @@ public class Menu<R> {
 
     /**
      * @param title   Title of the menu
-     * @param options A list of all possible options
+     * @param options A list of all possible client
      */
     public Menu(
             final String title,
@@ -50,7 +52,7 @@ public class Menu<R> {
     /**
      * @param title       Title of the menu
      * @param description Description of the menu
-     * @param options     A list of all possible options
+     * @param options     A list of all possible client
      */
     public Menu(
             final String title,
@@ -77,7 +79,7 @@ public class Menu<R> {
     }
 
     /**
-     * @return List of the options
+     * @return List of the client
      */
     public List<Tuple<String, R>> getOptions() {
         return this.options;

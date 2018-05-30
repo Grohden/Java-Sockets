@@ -1,7 +1,7 @@
 package app;
 
 import app.gui.Menu;
-import app.gui.Tuple;
+import app.utils.Tuple;
 
 import java.util.Arrays;
 

@@ -11,6 +11,10 @@ public class UserRegistry {
         userList.removeIf(listUser -> listUser.getEmail().equals(user.getEmail()));
     }
 
+    public static Collection<User> getAll(){
+        return userList;
+    }
+
     /**
      * Inserts a new inser in the userList only if there's no other
      * user using the user email

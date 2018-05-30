@@ -16,12 +16,12 @@ TODO
 
 There's a file called build.bat to build (rly?), but here are the commands it runs:
 
-Then, compile the java files into class files: 
+First, compile the java files into class files: 
 * `javac src\app\App.java -cp src\ -d build\`
 
 Then generate an executable jar:
 * `cd build`
 * `jar cfvm sockets.jar META-INF\MANIFEST.MF app`
 
-To execute:
+And execute:
 * `java -jar sockets.jar`

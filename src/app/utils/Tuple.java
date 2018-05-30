@@ -1,4 +1,4 @@
-package app.gui;
+package app.utils;
 
 import java.io.Serializable;
 
@@ -21,5 +21,10 @@ public class Tuple<L, R> implements Serializable {
 
     public R getRight() {
         return this.right;
+    }
+
+    @Override
+    public String toString() {
+        return "Tuple: " + getLeft() + ":" + getRight();
     }
 }
