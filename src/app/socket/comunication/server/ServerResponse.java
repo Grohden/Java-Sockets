@@ -1,4 +1,4 @@
-package app.comunication.server;
+package app.socket.comunication.server;
 
 import java.io.Serializable;
 import java.util.Optional;

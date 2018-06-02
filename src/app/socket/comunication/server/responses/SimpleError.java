@@ -1,6 +1,6 @@
-package app.comunication.server.responses;
+package app.socket.comunication.server.responses;
 
-import app.comunication.server.ServerResponse;
+import app.socket.comunication.server.ServerResponse;
 
 public class SimpleError extends ServerResponse<String> {
     public SimpleError(String message) {

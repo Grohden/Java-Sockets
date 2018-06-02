@@ -1,5 +1,6 @@
 package app.socket;
 
+import app.socket.comunication.client.ClientOption;
 import app.utils.Tuple;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public class SocketHelper {
         }
     }
 
-    public static void sendMessage(Socket socket, UserAction sendMessage) throws IOException {
+    public static void sendMessage(Socket socket, ClientOption sendMessage) throws IOException {
         final OutputStream os = socket.getOutputStream();
         final OutputStreamWriter osw = new OutputStreamWriter(os);
         final BufferedWriter bw = new BufferedWriter(osw);

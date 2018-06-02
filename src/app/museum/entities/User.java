@@ -1,6 +1,6 @@
-package app.museum;
+package app.museum.entities;
 
-import app.gui.Menu;
+import app.console.Menu;
 
 import java.io.Serializable;
 import java.util.Calendar;

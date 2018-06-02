@@ -1,6 +1,7 @@
 package app.socket;
 
-import app.comunication.server.ServerResponse;
+import app.socket.comunication.client.ClientOption;
+import app.socket.comunication.server.ServerResponse;
 import app.utils.Tuple;
 
 import java.io.IOException;
@@ -10,18 +11,18 @@ import java.util.Optional;
 
 public class ClientSocketHelper {
 
-    private static void sendServerAction(Socket socket, UserAction action, Serializable message) throws IOException {
+    private static void sendServerAction(Socket socket, ClientOption action, Serializable message) throws IOException {
         SocketHelper.sendObjectMessage(
                 socket,
                 Tuple.from(action, message)
         );
     }
 
-    public static Optional<ServerResponse> sendMessage(Socket server, UserAction action) {
+    public static Optional<ServerResponse> sendMessage(Socket server, ClientOption action) {
         return sendMessage(server, action,null);
     }
 
-    public static Optional<ServerResponse> sendMessage(Socket server, UserAction action, Serializable object) {
+    public static Optional<ServerResponse> sendMessage(Socket server, ClientOption action, Serializable object) {
         try {
             sendServerAction(server, action, object);
         } catch (IOException ignored) {}

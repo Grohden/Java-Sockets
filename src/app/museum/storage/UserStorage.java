@@ -1,10 +1,12 @@
-package app.museum;
+package app.museum.storage;
+
+import app.museum.entities.User;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class UserRegistry {
+public class UserStorage {
     private static Collection<User> userList = new HashSet<>();
 
     public static void removeUser(User user) {

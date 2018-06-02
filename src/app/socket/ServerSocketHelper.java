@@ -1,6 +1,6 @@
 package app.socket;
 
-import app.comunication.server.ServerResponse;
+import app.socket.comunication.server.ServerResponse;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -1,4 +1,4 @@
-package app.gui;
+package app.console;
 
 import app.utils.Tuple;
 

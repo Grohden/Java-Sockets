@@ -1,15 +1,15 @@
 package app;
 
-import app.comunication.server.ServerResponse;
-import app.comunication.server.responses.AllUsers;
-import app.comunication.server.responses.SimpleError;
-import app.comunication.server.responses.SimpleSuccess;
-import app.utils.Tuple;
-import app.museum.User;
-import app.museum.UserRegistry;
+import app.museum.entities.User;
+import app.museum.storage.UserStorage;
 import app.socket.ServerSocketHelper;
 import app.socket.SocketHelper;
-import app.socket.UserAction;
+import app.socket.comunication.client.ClientOption;
+import app.socket.comunication.server.ServerResponse;
+import app.socket.comunication.server.responses.AllUsers;
+import app.socket.comunication.server.responses.SimpleError;
+import app.socket.comunication.server.responses.SimpleSuccess;
+import app.utils.Tuple;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,7 +27,7 @@ public class ServerApp {
     private static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
     private static ServerResponse doRegister(User newUser) {
-        final boolean success = UserRegistry.addUser(newUser);
+        final boolean success = UserStorage.addUser(newUser);
 
         return success
                 ? new SimpleSuccess("Success")
@@ -35,7 +35,7 @@ public class ServerApp {
     }
 
     private static ServerResponse processAction(Tuple tuple) {
-        UserAction ac = (UserAction) tuple.getLeft();
+        ClientOption ac = (ClientOption) tuple.getLeft();
 
         switch (ac) {
             case REGISTER:
@@ -48,7 +48,7 @@ public class ServerApp {
     }
 
     private static AllUsers doSendAllUsers() {
-        return new AllUsers(UserRegistry.getAll());
+        return new AllUsers(UserStorage.getAll());
     }
 
     private static void sendResponse(Socket server, ServerResponse response, Integer tryCount) {

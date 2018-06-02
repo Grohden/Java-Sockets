@@ -1,4 +1,4 @@
-package app.museum;
+package app.museum.entities;
 
 import java.util.Calendar;
 

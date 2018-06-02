@@ -1,7 +1,7 @@
-package app.comunication.server.responses;
+package app.socket.comunication.server.responses;
 
-import app.museum.User;
-import app.comunication.server.ServerResponse;
+import app.museum.entities.User;
+import app.socket.comunication.server.ServerResponse;
 
 import java.util.Collection;
 

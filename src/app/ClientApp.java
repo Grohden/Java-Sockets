@@ -1,12 +1,12 @@
 package app;
 
-import app.comunication.server.ServerResponse;
-import app.comunication.server.responses.AllUsers;
-import app.gui.Menu;
-import app.museum.User;
+import app.console.Menu;
+import app.museum.entities.User;
 import app.socket.ClientSocketHelper;
 import app.socket.SocketHelper;
-import app.socket.UserAction;
+import app.socket.comunication.client.ClientOption;
+import app.socket.comunication.server.ServerResponse;
+import app.socket.comunication.server.responses.AllUsers;
 import app.utils.Tuple;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class ClientApp {
     private static Socket getAndCacheInitialConnection() {
         final Socket connection = getConnection();
 
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(connection, UserAction.HELLO);
+        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(connection, ClientOption.HELLO);
 
         try {
             connection.close();
@@ -80,13 +80,14 @@ public class ClientApp {
 
     private static void requestAllUsers() {
         Socket server = getConnection();
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, UserAction.LIST_USERS, null);
+        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.LIST_USERS, null);
 
         Boolean failed = response
                 .map(ServerResponse::isError)
                 .orElse(true);
 
         if (failed) {
+            //FIXME: compiler bug here, do not remove the cast!
             final String errorMessage = (String) response
                     .flatMap(ServerResponse::getMessage)
                     .orElse("Error requesting users");
@@ -112,17 +113,21 @@ public class ClientApp {
         }
     }
 
+    /**
+     * Tries to register a user in the server socket
+     */
     private static void registerUser() {
         final User user = User.promptUser();
 
         Socket server = getConnection();
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, UserAction.REGISTER, user);
+        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.REGISTER, user);
 
         Boolean failed = response
                 .map(ServerResponse::isError)
                 .orElse(true);
 
         if (failed) {
+            //FIXME: compiler bug here, do not remove the cast!
             final String errorMessage = (String) response
                     .flatMap(ServerResponse::getMessage)
                     .orElse("Server error sending user");
