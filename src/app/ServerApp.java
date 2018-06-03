@@ -27,7 +27,7 @@ public class ServerApp {
     private static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
     private static ServerResponse doRegister(User newUser) {
-        final boolean success = UserStorage.addUser(newUser);
+        final boolean success = UserStorage.get().store(newUser);
 
         return success
                 ? new SimpleSuccess("Success")
@@ -48,7 +48,7 @@ public class ServerApp {
     }
 
     private static AllUsers doSendAllUsers() {
-        return new AllUsers(UserStorage.getAll());
+        return new AllUsers(UserStorage.get().getCollection());
     }
 
     private static void sendResponse(Socket server, ServerResponse response, Integer tryCount) {
