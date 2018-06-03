@@ -1,13 +1,12 @@
 package app.socket.comunication.server.responses;
 
-import app.museum.entities.User;
 import app.socket.comunication.server.ServerResponse;
 
 import java.util.Collection;
 
-public class AllUsers extends ServerResponse<Collection<User>> {
+public class CollectionResponse<T> extends ServerResponse<Collection<T>> {
 
-    public AllUsers(Collection<User> result) {
+    public CollectionResponse(Collection<T> result) {
         super(result);
     }
 

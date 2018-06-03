@@ -1,18 +1,20 @@
 package app;
 
 import app.console.Menu;
+import app.museum.entities.Painting;
 import app.museum.entities.User;
 import app.socket.ClientSocketHelper;
 import app.socket.SocketHelper;
 import app.socket.comunication.client.ClientOption;
 import app.socket.comunication.server.ServerResponse;
-import app.socket.comunication.server.responses.AllUsers;
+import app.socket.comunication.server.responses.CollectionResponse;
 import app.utils.Tuple;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ClientApp {
     private static final String CONNECTION_SUCCESS = "Connection succeeded";
@@ -26,7 +28,8 @@ public class ClientApp {
                     Tuple.from("Remove registry", () -> {
                     }),
                     Tuple.from("View all users", ClientApp::requestAllUsers),
-                    Tuple.from("See painting infos", () -> {
+                    Tuple.from("View all paintings", ClientApp::requestAllPaintings),
+                    Tuple.from("See painting info", () -> {
                     })
             )
     );
@@ -78,9 +81,13 @@ public class ClientApp {
         return clientSocket.orElseGet(ClientApp::getConnection);
     }
 
-    private static void requestAllUsers() {
+    private static <T> void requestCollection(
+            Class<T> expectedType, // oh well, generics is a hell. TODO: use this param for something else than type inference?
+            ClientOption option,
+            Consumer<CollectionResponse<T>> successHandler
+    ) {
         Socket server = getConnection();
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.LIST_USERS, null);
+        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, option, null);
 
         Boolean failed = response
                 .map(ServerResponse::isError)
@@ -90,20 +97,38 @@ public class ClientApp {
             //FIXME: compiler bug here, do not remove the cast!
             final String errorMessage = (String) response
                     .flatMap(ServerResponse::getMessage)
-                    .orElse("Error requesting users");
+                    .orElse("Error requesting collection");
 
             System.out.println(errorMessage);
         } else {
-            final AllUsers dataResponse = (AllUsers) (response.get());
-            dataResponse
-                    .getReturn()
-                    .forEach(System.out::println);
-
-            System.out.println("Success!");
+            successHandler.accept(
+                    //FIXME: compiler bug here, do not remove the specialization!
+                    (CollectionResponse<T>) response.get()
+            );
         }
 
         closeSocket(server);
 
+    }
+
+    private static void requestAllUsers() {
+        requestCollection(
+                User.class,
+                ClientOption.LIST_USERS,
+                response -> response
+                        .getReturn()
+                        .forEach(System.out::println)
+        );
+    }
+
+    private static void requestAllPaintings() {
+        requestCollection(
+                Painting.class,
+                ClientOption.LIST_PAINTINGS,
+                response -> response
+                        .getReturn()
+                        .forEach(System.out::println)
+        );
     }
 
     private static void closeSocket(Socket server) {

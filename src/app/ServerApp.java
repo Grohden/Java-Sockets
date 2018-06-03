@@ -1,12 +1,14 @@
 package app;
 
+import app.museum.entities.Painting;
 import app.museum.entities.User;
+import app.museum.storage.types.PaintingStorage;
 import app.museum.storage.types.UserStorage;
 import app.socket.ServerSocketHelper;
 import app.socket.SocketHelper;
 import app.socket.comunication.client.ClientOption;
 import app.socket.comunication.server.ServerResponse;
-import app.socket.comunication.server.responses.AllUsers;
+import app.socket.comunication.server.responses.CollectionResponse;
 import app.socket.comunication.server.responses.SimpleError;
 import app.socket.comunication.server.responses.SimpleSuccess;
 import app.utils.Tuple;
@@ -40,6 +42,8 @@ public class ServerApp {
         switch (ac) {
             case REGISTER:
                 return doRegister((User) tuple.getRight());
+            case LIST_PAINTINGS:
+                return doSendAllPainting();
             case LIST_USERS:
                 return doSendAllUsers();
             default:
@@ -47,8 +51,16 @@ public class ServerApp {
         }
     }
 
-    private static AllUsers doSendAllUsers() {
-        return new AllUsers(UserStorage.get().getCollection());
+    private static CollectionResponse<Painting> doSendAllPainting() {
+        return new CollectionResponse<>(
+                PaintingStorage.get().getCollection()
+        );
+    }
+
+    private static CollectionResponse<User> doSendAllUsers() {
+        return new CollectionResponse<>(
+                UserStorage.get().getCollection()
+        );
     }
 
     private static void sendResponse(Socket server, ServerResponse response, Integer tryCount) {
