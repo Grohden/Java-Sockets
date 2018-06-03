@@ -1,7 +1,7 @@
 package app;
 
 import app.museum.entities.User;
-import app.museum.storage.UserStorage;
+import app.museum.storage.types.UserStorage;
 import app.socket.ServerSocketHelper;
 import app.socket.SocketHelper;
 import app.socket.comunication.client.ClientOption;

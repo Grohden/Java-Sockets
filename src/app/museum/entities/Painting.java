@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 public class Painting {
     private String authorName;
+    private String name;
     private Calendar paintingDate;
     private String description;
 
@@ -36,6 +37,15 @@ public class Painting {
 
     public Painting setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Painting setName(String name) {
+        this.name = name;
         return this;
     }
 }
