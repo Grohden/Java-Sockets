@@ -14,7 +14,7 @@ public class UserStorage extends Storage<User> {
     }
 
     public static UserStorage get() {
-        if (instance != null) {
+        if (instance == null) {
             instance = new UserStorage();
         }
 

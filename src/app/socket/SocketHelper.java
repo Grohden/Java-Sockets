@@ -26,6 +26,7 @@ public class SocketHelper {
         bw.flush();
 
         System.out.println("Message sent: " + sendMessage);
+        System.out.println();
     }
 
     public static <T> Optional<T> getObjectMessage(Socket socket, Class<T> clazz) {
@@ -35,6 +36,7 @@ public class SocketHelper {
             final T received = clazz.cast(inStream.readObject());
 
             System.out.println("Object received : " + received);
+            System.out.println();
 
             return Optional.of(received);
         } catch (Exception e) {
@@ -45,6 +47,8 @@ public class SocketHelper {
     public static void sendObjectMessage(Socket socket, Serializable message) throws IOException {
         ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.writeObject(message);
+
         System.out.println("Object sent: " + message);
+        System.out.println();
     }
 }

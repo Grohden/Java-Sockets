@@ -1,16 +1,26 @@
 package app.museum.storage;
 
+import app.museum.interfaces.SocketSendable;
+import app.socket.comunication.server.responses.CollectionResponse;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class Storage<T> {
+public abstract class Storage<T> implements SocketSendable<T> {
     private final Collection<T> collection = new HashSet<>();
 
     public Collection<T> getCollection() {
         return collection;
+    }
+
+    @Override
+    public CollectionResponse<T> transformToResponse() {
+        return new CollectionResponse<>(
+                getCollection()
+        );
     }
 
     protected abstract Function<T, Predicate<T>> equalsPredicate();

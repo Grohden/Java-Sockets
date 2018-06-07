@@ -1,22 +1,17 @@
 package app.museum.entities;
 
 import app.console.Menu;
+import app.museum.interfaces.CommandLineCreatable;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class User implements Serializable {
+public class User implements Serializable, CommandLineCreatable<User> {
 
     private String name;
     private String email;
     private Calendar registryDate;
-
-    public static User promptUser() {
-        return new User()
-                .setName(Menu.prompt("Inform user name: "))
-                .setEmail(Menu.prompt("Inform user email: "))
-                .setRegistryDate(Calendar.getInstance());
-    }
 
     public String getName() {
         return name;
@@ -38,7 +33,14 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return name + " : " + email + " : " + registryDate.toInstant();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yyyy");
+
+        return String.format(
+                "User data: \n* Name - %s \n* Email: %s \n* Registry date: %s",
+                name,
+                email,
+                dateFormat.format(registryDate)
+        );
     }
 
     public Calendar getRegistryDate() {
@@ -50,4 +52,11 @@ public class User implements Serializable {
         return this;
     }
 
+    @Override
+    public User onCommandLineRequest() {
+        return new User()
+                .setName(Menu.prompt("Inform user name: "))
+                .setEmail(Menu.prompt("Inform user email: "))
+                .setRegistryDate(Calendar.getInstance());
+    }
 }

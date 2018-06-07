@@ -5,7 +5,7 @@ A "simple" app using sockets API, it implements a basic museum "site", that allo
 * Register in the site (why? dunno) 
 * Remove the registry from the site
 * See all the registered users
-* See all the paintings in a list
+* See all the artworks in a list
 
 # Build
 

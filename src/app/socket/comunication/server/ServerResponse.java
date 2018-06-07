@@ -30,4 +30,9 @@ public abstract class ServerResponse<T> implements Serializable {
      * If the response is an error or not
      */
     public abstract boolean isError();
+
+    @Override
+    public String toString() {
+        return getReturn() + getMessage().map(m -> ":" + m).orElse("");
+    }
 }

@@ -1,7 +1,7 @@
 package app;
 
 import app.console.Menu;
-import app.museum.entities.Painting;
+import app.museum.entities.Artwork;
 import app.museum.entities.User;
 import app.socket.ClientSocketHelper;
 import app.socket.SocketHelper;
@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 public class ClientApp {
     private static final String CONNECTION_SUCCESS = "Connection succeeded";
     private static final String CONNECTION_ERROR = "Socket connection error, try again";
+    private static final Integer MAXIMUM_CONNECTION_ATTEMPTS = 3;
     private static Tuple<String, Integer> cachedSocketInformation;
 
     private static final Menu<Runnable> clientMenu = new Menu<>(
@@ -28,7 +29,7 @@ public class ClientApp {
                     Tuple.from("Remove registry", () -> {
                     }),
                     Tuple.from("View all users", ClientApp::requestAllUsers),
-                    Tuple.from("View all paintings", ClientApp::requestAllPaintings),
+                    Tuple.from("View all artworks", ClientApp::requestAllArtworks),
                     Tuple.from("See painting info", () -> {
                     })
             )
@@ -51,26 +52,34 @@ public class ClientApp {
      * if it cant connect, try again until it works.
      */
     private static Socket getAndCacheInitialConnection() {
-        final Socket connection = getConnection();
+        final Optional<Socket> connection = getConnection();
 
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(connection, ClientOption.HELLO);
+        if (connection.isPresent()) {
+            ClientSocketHelper.sendMessage(connection.get(), ClientOption.HELLO);
 
-        try {
-            connection.close();
-        } catch (IOException ignored) {
+            try {
+                connection.get().close();
+            } catch (IOException ignored) {
+            }
+
+            System.out.println(CONNECTION_SUCCESS);
+            return connection.get();
+        } else {
+            return getAndCacheInitialConnection();
         }
-
-        System.out.println(CONNECTION_SUCCESS);
-        return connection;
     }
 
     /**
      * Prompts the user for an IP and a port number and try to connect
-     * if it cant connect, try again until it works.
+     * if it cant connect, try again until the count reaches the maximum
      */
-    private static Socket getConnection() {
+    private static Optional<Socket> getConnection(Integer count) {
 
-        final Tuple<String, Integer> socketInformation;
+        if (count >= MAXIMUM_CONNECTION_ATTEMPTS) {
+            System.out.println(CONNECTION_ERROR);
+            cachedSocketInformation = null;
+            return Optional.empty();
+        }
 
         if (cachedSocketInformation == null) {
             cachedSocketInformation = promptSocketConnection();
@@ -78,42 +87,49 @@ public class ClientApp {
 
         Optional<Socket> clientSocket = SocketHelper.tryConnection(cachedSocketInformation);
 
-        return clientSocket.orElseGet(ClientApp::getConnection);
+        return clientSocket.isPresent()
+                ? clientSocket
+                : getConnection(count + 1);
+    }
+
+    private static Optional<Socket> getConnection() {
+        return getConnection(0);
     }
 
     private static <T> void requestCollection(
-            Class<T> expectedType, // oh well, generics is a hell. TODO: use this param for something else than type inference?
             ClientOption option,
             Consumer<CollectionResponse<T>> successHandler
     ) {
-        Socket server = getConnection();
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, option, null);
+        getConnection().ifPresent(server -> {
 
-        Boolean failed = response
-                .map(ServerResponse::isError)
-                .orElse(true);
+            Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, option, null);
 
-        if (failed) {
-            //FIXME: compiler bug here, do not remove the cast!
-            final String errorMessage = (String) response
-                    .flatMap(ServerResponse::getMessage)
-                    .orElse("Error requesting collection");
+            Boolean failed = response
+                    .map(ServerResponse::isError)
+                    .orElse(true);
 
-            System.out.println(errorMessage);
-        } else {
-            successHandler.accept(
-                    //FIXME: compiler bug here, do not remove the specialization!
-                    (CollectionResponse<T>) response.get()
-            );
-        }
+            if (failed) {
+                //FIXME: compiler bug here, do not remove the cast!
+                final String errorMessage = (String) response
+                        .flatMap(ServerResponse::getMessage)
+                        .orElse("Error requesting collection");
 
-        closeSocket(server);
+                System.out.println(errorMessage);
+            } else {
+                successHandler.accept(
+                        //FIXME: compiler bug here, do not remove the specialization!
+                        (CollectionResponse<T>) response.get()
+                );
+            }
+            closeSocket(server);
+
+        });
+
 
     }
 
     private static void requestAllUsers() {
-        requestCollection(
-                User.class,
+        ClientApp.<User>requestCollection(
                 ClientOption.LIST_USERS,
                 response -> response
                         .getReturn()
@@ -121,10 +137,9 @@ public class ClientApp {
         );
     }
 
-    private static void requestAllPaintings() {
-        requestCollection(
-                Painting.class,
-                ClientOption.LIST_PAINTINGS,
+    private static void requestAllArtworks() {
+        ClientApp.<Artwork>requestCollection(
+                ClientOption.LIST_ARTWORKS,
                 response -> response
                         .getReturn()
                         .forEach(System.out::println)
@@ -142,27 +157,27 @@ public class ClientApp {
      * Tries to register a user in the server socket
      */
     private static void registerUser() {
-        final User user = User.promptUser();
+        getConnection().ifPresent(server -> {
+            final User user = User.promptUser();
+            Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.REGISTER, user);
 
-        Socket server = getConnection();
-        Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.REGISTER, user);
+            Boolean failed = response
+                    .map(ServerResponse::isError)
+                    .orElse(true);
 
-        Boolean failed = response
-                .map(ServerResponse::isError)
-                .orElse(true);
+            if (failed) {
+                //FIXME: compiler bug here, do not remove the cast!
+                final String errorMessage = (String) response
+                        .flatMap(ServerResponse::getMessage)
+                        .orElse("Server error sending user");
 
-        if (failed) {
-            //FIXME: compiler bug here, do not remove the cast!
-            final String errorMessage = (String) response
-                    .flatMap(ServerResponse::getMessage)
-                    .orElse("Server error sending user");
+                System.out.println(errorMessage);
+            } else {
+                System.out.println("Success!");
+            }
 
-            System.out.println(errorMessage);
-        } else {
-            System.out.println("Success!");
-        }
-
-        closeSocket(server);
+            closeSocket(server);
+        });
     }
 
     /**

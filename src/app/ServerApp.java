@@ -1,8 +1,8 @@
 package app;
 
-import app.museum.entities.Painting;
+import app.museum.entities.Artwork;
 import app.museum.entities.User;
-import app.museum.storage.types.PaintingStorage;
+import app.museum.storage.types.ArtworkStorage;
 import app.museum.storage.types.UserStorage;
 import app.socket.ServerSocketHelper;
 import app.socket.SocketHelper;
@@ -42,24 +42,20 @@ public class ServerApp {
         switch (ac) {
             case REGISTER:
                 return doRegister((User) tuple.getRight());
-            case LIST_PAINTINGS:
-                return doSendAllPainting();
+            case LIST_ARTWORKS:
+                return ArtworkStorage.get().transformToResponse();
             case LIST_USERS:
-                return doSendAllUsers();
+                return UserStorage.get().transformToResponse();
+            case HELLO:
+                return new SimpleSuccess("World!");
             default:
                 return new SimpleError(OPERATION_NOT_SUPPORTED);
         }
     }
 
-    private static CollectionResponse<Painting> doSendAllPainting() {
+    private static CollectionResponse<Artwork> doSendAllArtwork() {
         return new CollectionResponse<>(
-                PaintingStorage.get().getCollection()
-        );
-    }
-
-    private static CollectionResponse<User> doSendAllUsers() {
-        return new CollectionResponse<>(
-                UserStorage.get().getCollection()
+                ArtworkStorage.get().getCollection()
         );
     }
 
@@ -79,8 +75,8 @@ public class ServerApp {
         sendResponse(server, response, 0);
     }
 
-
     public static void boot() {
+
         try {
             final ServerSocket server = new ServerSocket(DEFAULT_PORT);
             final InetAddress localHost = InetAddress.getLocalHost();
