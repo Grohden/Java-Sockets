@@ -6,5 +6,5 @@ package app.museum.interfaces;
  * using (or not) those informations
  */
 public interface CommandLineCreatable<T> {
-    T onCommandLineRequest();
+    T requestDataFromConsole();
 }

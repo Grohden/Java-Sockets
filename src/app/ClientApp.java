@@ -158,7 +158,7 @@ public class ClientApp {
      */
     private static void registerUser() {
         getConnection().ifPresent(server -> {
-            final User user = User.promptUser();
+            final User user = new User().requestDataFromConsole();
             Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.REGISTER, user);
 
             Boolean failed = response

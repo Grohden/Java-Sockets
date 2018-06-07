@@ -53,8 +53,8 @@ public class User implements Serializable, CommandLineCreatable<User> {
     }
 
     @Override
-    public User onCommandLineRequest() {
-        return new User()
+    public User requestDataFromConsole() {
+        return this
                 .setName(Menu.prompt("Inform user name: "))
                 .setEmail(Menu.prompt("Inform user email: "))
                 .setRegistryDate(Calendar.getInstance());
