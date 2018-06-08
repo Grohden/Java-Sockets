@@ -27,9 +27,8 @@ public class ClientApp {
     private static final Menu<Runnable> clientMenu = new Menu<>(
             "Client menu, choose what to do",
             Arrays.asList(
-                    Tuple.from("Register", ClientApp::registerUser),
-                    Tuple.from("Remove registry", () -> {
-                    }),
+                    Tuple.from("Register user", ClientApp::registerUser),
+                    Tuple.from("Remove user registry", ClientApp::removeUser),
                     Tuple.from("View all users", ClientApp::requestAllUsers),
                     Tuple.from("View all artworks", ClientApp::requestAllArtworks),
                     Tuple.from("See painting info", () -> {
@@ -159,9 +158,42 @@ public class ClientApp {
      * Tries to register a user in the server socket
      */
     private static void registerUser() {
+        final User user = new User().requestDataFromConsole();
+
         getConnection().ifPresent(server -> {
-            final User user = new User().requestDataFromConsole();
-            Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.REGISTER, user);
+            Optional<ServerResponse> response = ClientSocketHelper.sendMessage(server, ClientOption.ADD_USER_REGISTRY, user);
+
+            Boolean failed = response
+                    .map(ServerResponse::isError)
+                    .orElse(true);
+
+            if (failed) {
+                //FIXME: compiler bug here, do not remove the cast!
+                final String errorMessage = (String) response
+                        .flatMap(ServerResponse::getMessage)
+                        .orElse("Server error sending user");
+
+                System.out.println(errorMessage);
+            } else {
+                System.out.println("Success!");
+            }
+
+            closeSocket(server);
+        });
+    }
+
+    /**
+     * Tries to register a user in the server socket
+     */
+    private static void removeUser() {
+        final String userEmail = Menu.prompt("User email: ");
+
+        getConnection().ifPresent(server -> {
+            Optional<ServerResponse> response = ClientSocketHelper.sendMessage(
+                    server,
+                    ClientOption.REMOVE_USER_REGISTRY,
+                    userEmail
+            );
 
             Boolean failed = response
                     .map(ServerResponse::isError)

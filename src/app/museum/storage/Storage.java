@@ -41,7 +41,7 @@ public abstract class Storage<T> implements SocketSendable<T> {
         }
     }
 
-    public void remove(Predicate<T> isPresentPredicate) {
-        collection.removeIf(isPresentPredicate);
+    public boolean remove(Predicate<T> isPresentPredicate) {
+        return collection.removeIf(isPresentPredicate);
     }
 }

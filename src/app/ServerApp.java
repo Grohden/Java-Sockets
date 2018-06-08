@@ -42,8 +42,10 @@ public class ServerApp {
         ClientOption ac = (ClientOption) tuple.getLeft();
 
         switch (ac) {
-            case REGISTER:
+            case ADD_USER_REGISTRY:
                 return doRegister((User) tuple.getRight());
+            case REMOVE_USER_REGISTRY:
+                return removeUserByEmail((String) tuple.getRight());
             case LIST_ARTWORKS:
                 return ArtworkStorage.get().transformToResponse();
             case LIST_USERS:
@@ -53,6 +55,18 @@ public class ServerApp {
             default:
                 return new SimpleError(OPERATION_NOT_SUPPORTED);
         }
+    }
+
+    private static ServerResponse removeUserByEmail(String email) {
+        final Boolean success = UserStorage.get().remove(user -> user.getEmail().equals(email));
+
+        if (success) {
+
+            return new SimpleSuccess("User removed");
+        } else {
+            return new SimpleError("Error! User with email '" + email + "' not found");
+        }
+
     }
 
     private static CollectionResponse<Artwork> doSendAllArtwork() {

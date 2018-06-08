@@ -140,10 +140,12 @@ public class Menu<R> {
             }
 
             if (choice > 0 && (choice - 1) < getOptions().size()) {
+                clearSystemStream();
                 return Optional.of(getOptions().get(choice - 1).getRight());
             } else if (choice < 1 || choice > getOptions().size() + 1) {
                 System.out.println(INVALID_CHOICE);
             } else {
+                clearSystemStream();
                 return Optional.empty();
             }
 
@@ -166,7 +168,17 @@ public class Menu<R> {
             input = sc.nextLine();
         } while (input.equals(""));
 
+        clearSystemStream();
+
         return input;
+    }
+
+    private static void clearSystemStream() {
+        try {
+            System.in.skip(System.in.available());
+        } catch (Exception ignored) {
+
+        }
     }
 
     /**
