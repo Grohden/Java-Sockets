@@ -33,13 +33,13 @@ public class User implements Serializable, CommandLineCreatable<User> {
 
     @Override
     public String toString() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         return String.format(
                 "User data: \n* Name - %s \n* Email: %s \n* Registry date: %s",
                 name,
                 email,
-                dateFormat.format(registryDate)
+                dateFormat.format(registryDate.getTime())
         );
     }
 
