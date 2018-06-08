@@ -9,6 +9,8 @@ import app.socket.comunication.client.ClientOption;
 import app.socket.comunication.server.ServerResponse;
 import app.socket.comunication.server.responses.CollectionResponse;
 import app.utils.Tuple;
+import app.utils.log.Logger;
+import app.utils.log.LoggerType;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -185,6 +187,8 @@ public class ClientApp {
      * try to connect
      */
     public static void boot() {
+        Logger.setLoggerType(LoggerType.CLIENT);
+
         Optional<Runnable> chosenOption;
         getAndCacheInitialConnection();
 

@@ -36,7 +36,7 @@ public class User implements Serializable, CommandLineCreatable<User> {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         return String.format(
-                "User data: \n* Name - %s \n* Email: %s \n* Registry date: %s",
+                "User data: \n* Name: %s \n* Email: %s \n* Registry date: %s",
                 name,
                 email,
                 dateFormat.format(registryDate.getTime())

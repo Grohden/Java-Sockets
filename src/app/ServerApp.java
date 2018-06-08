@@ -12,6 +12,8 @@ import app.socket.comunication.server.responses.CollectionResponse;
 import app.socket.comunication.server.responses.SimpleError;
 import app.socket.comunication.server.responses.SimpleSuccess;
 import app.utils.Tuple;
+import app.utils.log.Logger;
+import app.utils.log.LoggerType;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -76,6 +78,8 @@ public class ServerApp {
     }
 
     public static void boot() {
+        Logger.setLoggerType(LoggerType.SERVER);
+
 
         try {
             final ServerSocket server = new ServerSocket(DEFAULT_PORT);

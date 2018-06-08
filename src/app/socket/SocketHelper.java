@@ -2,12 +2,15 @@ package app.socket;
 
 import app.socket.comunication.client.ClientOption;
 import app.utils.Tuple;
+import app.utils.log.Logger;
+import app.utils.log.LoggerType;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Optional;
 
 public class SocketHelper {
+    private static final Logger log = new Logger(LoggerType.SERVER);
 
     public static Optional<Socket> tryConnection(Tuple<String, Integer> socketInfo) {
         try {
@@ -25,8 +28,10 @@ public class SocketHelper {
         bw.write(sendMessage + "\n");
         bw.flush();
 
-        System.out.println("Message sent: " + sendMessage);
-        System.out.println();
+        log.info(() -> {
+            System.out.println("Message sent: " + sendMessage);
+            System.out.println();
+        });
     }
 
     public static <T> Optional<T> getObjectMessage(Socket socket, Class<T> clazz) {
@@ -35,8 +40,12 @@ public class SocketHelper {
             ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
             final T received = clazz.cast(inStream.readObject());
 
-            System.out.println("Object received : " + received);
-            System.out.println();
+
+            log.info(() -> {
+                System.out.println("Object received : " + received);
+                System.out.println();
+            });
+
 
             return Optional.of(received);
         } catch (Exception e) {
@@ -48,7 +57,9 @@ public class SocketHelper {
         ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.writeObject(message);
 
-        System.out.println("Object sent: " + message);
-        System.out.println();
+        log.info(() -> {
+            System.out.println("Object sent: " + message);
+            System.out.println();
+        });
     }
 }
