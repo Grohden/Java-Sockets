@@ -11,22 +11,18 @@ A "simple" app using sockets API, it implements a basic museum "site", that allo
 
 Since the person who asked me to do this doesn't know how to build 
 a program, read an README file or simple write anything but bad C code
-i need to make instructions on how to build this with linux, but im doing this in windows as well.
+i need to make simple instructions on how to build.
 
-### Linux
-
-TODO
-
-### Windows
-
-There's a file called build.bat to build (rly?), but here are the commands it runs:
+Here are the instructions:
 
 First, compile the java files into class files: 
 * `javac src\app\App.java -cp src\ -d build\`
 
 Then generate an executable jar:
 * `cd build`
-* `jar cfvm sockets.jar META-INF\MANIFEST.MF app`
+* `jar cfvm sockets.jar manifest.txt app`
 
-And execute:
+# Run
+
+After the build, you can run the jar **on the build folder**  with:
 * `java -jar sockets.jar`
