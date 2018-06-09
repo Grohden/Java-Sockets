@@ -1,17 +1,20 @@
 package app;
 
 import app.museum.entities.Artwork;
-import app.museum.entities.User;
+import app.museum.entities.Painting;
+import app.museum.entities.person.Author;
+import app.museum.entities.person.User;
 import app.museum.storage.types.ArtworkStorage;
+import app.museum.storage.types.AuthorStorage;
 import app.museum.storage.types.UserStorage;
 import app.socket.ServerSocketHelper;
 import app.socket.SocketHelper;
 import app.socket.comunication.client.ClientOption;
 import app.socket.comunication.server.ServerResponse;
-import app.socket.comunication.server.responses.CollectionResponse;
 import app.socket.comunication.server.responses.SimpleError;
 import app.socket.comunication.server.responses.SimpleSuccess;
 import app.utils.Tuple;
+import app.utils.log.LogLevel;
 import app.utils.log.Logger;
 import app.utils.log.LoggerType;
 
@@ -69,20 +72,18 @@ public class ServerApp {
 
     }
 
-    private static CollectionResponse<Artwork> doSendAllArtwork() {
-        return new CollectionResponse<>(
-                ArtworkStorage.get().getCollection()
-        );
-    }
-
     private static void sendResponse(Socket server, ServerResponse response, Integer tryCount) {
         if (tryCount >= MAX_RESPONSE_TRY) {
             System.out.println(MAX_RESPONSE_TRY_ERROR);
+            return;
         }
 
         try {
             ServerSocketHelper.sendResponse(server, response);
         } catch (IOException e) {
+
+            new Logger(LoggerType.SERVER).error(e::printStackTrace);
+
             sendResponse(server, response, tryCount + 1);
         }
     }
@@ -91,15 +92,51 @@ public class ServerApp {
         sendResponse(server, response, 0);
     }
 
+    private static void initializeStorages() {
+        final Author leonardo = new Author("Leonardo da Vinci");
+        final Author vanGogh = new Author("Vincent van Gogh");
+
+        AuthorStorage.get().storeAll(
+                leonardo,
+                vanGogh
+        );
+
+        final Artwork monaLisa = new Painting()
+                .setArtName("Mona Lisa")
+                .setAuthor(leonardo)
+                .setPaintCurrentLocation("Museu do Louvre")
+                .setCreationYear(1503);
+
+        final Artwork noiteEstrelada = new Painting()
+                .setArtName("A Noite Estrelada")
+                .setAuthor(vanGogh)
+                .setPaintCurrentLocation("Museu de Arte Moderna")
+                .setCreationYear(1889);
+
+        final Artwork autoRetrato = new Painting()
+                .setArtName("Auto-Retrato")
+                .setAuthor(vanGogh)
+                .setPaintCurrentLocation("Museu de Orsay")
+                .setCreationYear(1889);
+
+        ArtworkStorage.get().storeAll(
+                monaLisa,
+                noiteEstrelada,
+                autoRetrato
+        );
+    }
+
     public static void boot() {
         Logger.setLoggerType(LoggerType.SERVER);
+        LogLevel.ERROR.setEnabled(false);
 
+        initializeStorages();
 
         try {
             final ServerSocket server = new ServerSocket(DEFAULT_PORT);
             final InetAddress localHost = InetAddress.getLocalHost();
 
-            while(true){
+            while (true) {
 
                 System.out.println(String.format(
                         WAITING_CONNECTION,

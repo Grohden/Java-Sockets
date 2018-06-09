@@ -1,6 +1,6 @@
 package app.museum.storage.types;
 
-import app.museum.entities.User;
+import app.museum.entities.person.User;
 import app.museum.storage.Storage;
 
 import java.util.function.Function;

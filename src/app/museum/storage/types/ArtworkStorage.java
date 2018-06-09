@@ -24,7 +24,7 @@ public class ArtworkStorage extends Storage<Artwork> {
     @Override
     protected Function<Artwork, Predicate<Artwork>> equalsPredicate() {
         return base -> artwork -> {
-            final Boolean isAuthorSame = base.getAuthorName().equals(artwork.getAuthorName());
+            final Boolean isAuthorSame = base.getAuthor().equals(artwork.getAuthor());
             final Boolean isNameEquals = base.getArtName().equals(artwork.getArtName());
 
             return isAuthorSame && isNameEquals;

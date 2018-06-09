@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public abstract class Storage<T> implements SocketSendable<T> {
     private final Collection<T> collection = new HashSet<>();
@@ -24,6 +25,18 @@ public abstract class Storage<T> implements SocketSendable<T> {
     }
 
     protected abstract Function<T, Predicate<T>> equalsPredicate();
+
+    public final Storage<T> storeAll(T... elements) {
+        Stream.of(elements).forEach(this::store);
+        return this;
+    }
+
+    public Optional<T> findBy(Predicate<T> predicate) {
+        return getCollection()
+                .stream()
+                .filter(predicate)
+                .findFirst();
+    }
 
     public final boolean store(T element) {
         Predicate<T> comparator = equalsPredicate().apply(element);

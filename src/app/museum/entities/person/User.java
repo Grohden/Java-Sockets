@@ -1,26 +1,15 @@
-package app.museum.entities;
+package app.museum.entities.person;
 
 import app.console.Menu;
 import app.museum.interfaces.CommandLineCreatable;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class User implements Serializable, CommandLineCreatable<User> {
+public class User extends Person<User> implements CommandLineCreatable<User> {
 
-    private String name;
     private String email;
     private Calendar registryDate;
-
-    public String getName() {
-        return name;
-    }
-
-    public User setName(String name) {
-        this.name = name;
-        return this;
-    }
 
     public String getEmail() {
         return email;

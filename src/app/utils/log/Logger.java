@@ -29,4 +29,10 @@ public class Logger {
             messageSupplier.run();
         }
     }
+
+    public void error(Runnable messageSupplier) {
+        if (loggerType.typeEnables(instanceLogType) && LogLevel.ERROR.isEnabled()) {
+            messageSupplier.run();
+        }
+    }
 }

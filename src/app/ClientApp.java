@@ -1,8 +1,7 @@
 package app;
 
 import app.console.Menu;
-import app.museum.entities.Artwork;
-import app.museum.entities.User;
+import app.museum.entities.person.User;
 import app.socket.ClientSocketHelper;
 import app.socket.SocketHelper;
 import app.socket.comunication.client.ClientOption;
@@ -15,6 +14,7 @@ import app.utils.log.LoggerType;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -29,8 +29,18 @@ public class ClientApp {
             Arrays.asList(
                     Tuple.from("Register user", ClientApp::registerUser),
                     Tuple.from("Remove user registry", ClientApp::removeUser),
-                    Tuple.from("View all users", ClientApp::requestAllUsers),
-                    Tuple.from("View all artworks", ClientApp::requestAllArtworks),
+                    Tuple.from("View all users", () -> {
+                        ClientApp.requestAndShowCollection(
+                                ClientOption.LIST_USERS,
+                                "No users found"
+                        );
+                    }),
+                    Tuple.from("View all artworks", () -> {
+                        ClientApp.requestAndShowCollection(
+                                ClientOption.LIST_ARTWORKS,
+                                "No artworks found"
+                        );
+                    }),
                     Tuple.from("See painting info", () -> {
                     })
             )
@@ -129,21 +139,18 @@ public class ClientApp {
 
     }
 
-    private static void requestAllUsers() {
-        ClientApp.<User>requestCollection(
-                ClientOption.LIST_USERS,
-                response -> response
-                        .getReturn()
-                        .forEach(System.out::println)
-        );
-    }
+    private static void requestAndShowCollection(ClientOption option, String emptyMessage) {
+        ClientApp.requestCollection(
+                option,
+                response -> {
+                    Collection c = response.getReturn();
 
-    private static void requestAllArtworks() {
-        ClientApp.<Artwork>requestCollection(
-                ClientOption.LIST_ARTWORKS,
-                response -> response
-                        .getReturn()
-                        .forEach(System.out::println)
+                    if (c.isEmpty()) {
+                        System.out.println(emptyMessage);
+                    } else {
+                        c.forEach(System.out::println);
+                    }
+                }
         );
     }
 
@@ -200,7 +207,7 @@ public class ClientApp {
                     .orElse(true);
 
             if (failed) {
-                //FIXME: compiler bug here, do not remove the cast!
+                //FIXME: type inference bug here, do not remove the cast!
                 final String errorMessage = (String) response
                         .flatMap(ServerResponse::getMessage)
                         .orElse("Server error sending user");
